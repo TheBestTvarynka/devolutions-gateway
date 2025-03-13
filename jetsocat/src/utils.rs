@@ -89,7 +89,7 @@ pub(crate) async fn tcp_connect(req_addr: String, proxy_cfg: Option<ProxyConfig>
 type WebSocketConnectOutput = (ErasedReadWrite, Response);
 
 pub(crate) async fn ws_connect(addr: String, proxy_cfg: Option<ProxyConfig>) -> anyhow::Result<WebSocketConnectOutput> {
-    use tokio_tungstenite::client_async_tls;
+    use tokio_tungstenite::client_async;
 
     let req = addr.into_client_request()?;
 
@@ -107,7 +107,7 @@ pub(crate) async fn ws_connect(addr: String, proxy_cfg: Option<ProxyConfig>) -> 
 
     impl_tcp_connect!(req_addr, proxy_cfg, anyhow::Result<WebSocketConnectOutput>, |stream| {
         async {
-            let (ws, rsp) = client_async_tls(req, stream)
+            let (ws, rsp) = client_async(req, stream)
                 .await
                 .context("WebSocket handshake failed")?;
             let stream = Box::new(websocket_handle(ws)) as ErasedReadWrite;
